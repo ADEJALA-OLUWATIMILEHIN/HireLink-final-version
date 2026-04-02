@@ -3,8 +3,6 @@ import  User  from "../models/user";
 import { authenticate } from "../middleware/auth";
 import Job from "../models/job";
 import { Op } from "sequelize";
-import Employer from "../models/employer";
-
 
 const router = express.Router();
 
@@ -24,26 +22,27 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
             message: "User not found"
         });
     }
-  
-    const employer_Id = await Employer.findOne({ where: { user_Id: id } });
-   
-    const { title, company_name, description, location, job_type, salary_min, salary_max, location_type, requirements, isACTIVE } = req.body;
+    const employer_Id = req.user.id
+    console.log(employer_Id);
+    const { title,company,location, job_type,location_type, salary_min, salary_max,description,requirements,expires_at, is_active,view_count} = req.body;
 
     try {
         const newJob = await Job.create({
-            employer_Id: employer_Id?.employer_Id,
+            employer_id :employer_Id,
             title,
-            company_name,
-            description,
+            company,
             location,
             job_type,
+            location_type,
             salary_min,
             salary_max,
-            location_type,
+            description,
             requirements,
-            isACTIVE: isACTIVE || "Open"
+            expires_at, 
+            is_active,
+            view_count
         });
-
+   console.log(req.user)
         return res.status(201).json({
             message: "Job created successfully",
             job: newJob
@@ -60,7 +59,7 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
     try {
         const jobs = await Job.findAll({
-            where: { isACTIVE: "Open" },
+            where: { is_active: true},
             order: [['createdAt', 'DESC']]
         });
 
@@ -119,7 +118,7 @@ router.put("/:id", authenticate, async (req: Request, res: Response) => {
             });
         }
 
-        if (job.employer_Id !== userId) {
+        if (job.employer_id !== userId) {
             return res.status(403).json({
                 message: "Forbidden: You can only update your own jobs"
             });
@@ -158,7 +157,7 @@ router.delete("/:id", authenticate, async (req: Request, res: Response) => {
             });
         }
 
-        if (job.employer_Id !== userId) {
+        if (job.employer_id !== userId) {
             return res.status(403).json({
                 message: "Forbidden: You can only delete your own jobs"
             });
@@ -186,7 +185,7 @@ router.get("/search", async (req: Request, res: Response) => {
     const { title, location, job_type, salary_min, salary_max } = req.query;
 
     try {
-        const whereClause: any = { isACTIVE: "Open" };
+        const whereClause: any = { is_active: true };
 
         if (title) {
             whereClause.title = { [Op.iLike]: `%${title}%` };
@@ -277,7 +276,7 @@ router.get("/my-jobs", authenticate, async (req: Request, res: Response) => {
 router.patch("/status/:id", authenticate, async (req: Request, res: Response) => {
     const { id: userId, role } = req.user;
     const { id } = req.params;
-    const { isACTIVE } = req.body;
+    const { is_active } = req.body;
 
     if (role !== "employer") {
         return res.status(403).json({
@@ -293,13 +292,13 @@ router.patch("/status/:id", authenticate, async (req: Request, res: Response) =>
             });
         }
 
-        if (job.employer_Id !== userId) {
+        if (job.employer_id !== userId) {
             return res.status(403).json({
                 message: "Forbidden: You can only update your own jobs"
             });
         }
 
-        job.isACTIVE=isACTIVE;
+        job.is_active=is_active;
         await job.save();
 
         return res.status(200).json({

@@ -1,45 +1,60 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize";
+import Job from "./job";
+import User from "./user";
 
 class Bookmark extends Model {
-    bookmark_Id!: number;
-    job_Id!: number;
-    jobseeker_Id!: number;
-    createdAt!: Date;
+   id!: number;
+   job_id!: number;
+   job_seeker_id!: number;
+    created_at!: Date;
 }
 
 Bookmark.init(
     {
-        bookmark_Id: {
+        id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
             allowNull: false
         },
-        job_Id: {
+        job_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'job',
-                key: 'job_Id',
+                model: "jobs",
+                key: "id",
             },
         },
-        jobseeker_Id: {
+        job_seeker_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'jobseeker',
-                key: 'jobseeker_Id',
+                model: "users",
+                key: "id",
             },
+        },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
         },
     },
     {
         sequelize,
         modelName: "Bookmark",
+        tableName: "bookmarks",
         timestamps: true,
         updatedAt: false,
-        tableName: "bookmarks"
     }
 );
+
+Bookmark.belongsTo(Job, { foreignKey: "job_id", as: "job" }); 
+Job.hasMany(Bookmark, { foreignKey: "job_id", as: "bookmarks" });
+
+
+Bookmark.belongsTo(User, { foreignKey: "job_seeker_id", as: "jobSeeker" });
+User.hasMany(Bookmark, { foreignKey: "job_seeker_id", as: "bookmarks" });
+
 
 export default Bookmark;

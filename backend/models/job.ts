@@ -2,50 +2,47 @@ import { Sequelize, DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize";
 
 class Job extends Model {
-   job_Id!: number;
-   employer_Id!: number;
+    id!: number;
+    employer_id!: number;
     title!: string;
-    company_name!: string;
-    description!: string;
+    company!: string;
     location!: string;
-    job_type!: "Full-time" | "Part-time" | "Remote" | "Contract"| "Internship"|"Temporary";
+    job_type!: "full-time" | "part-time" | "contract" | "internship";
+    location_type!: "remote" | "on-site" | "hybrid";
     salary_min!: number;
     salary_max!: number;
-    location_type!:"On-site" | "Remote" | "Hybrid";
+    description!: string;
     requirements!: string;
-    isACTIVE!: "Open" | "Closed";
-    
-
+    posted_at!: Date;
+    expires_at!: Date;
+    is_active!: boolean;
+    view_count!: number;
+    created_at!: Date;
+    updated_at!: Date;
 }
 
 Job.init(
     {
-        // Model attributes are defined 
-        job_Id: {
+        id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
             allowNull: false
         },
-        employer_Id: {
+        employer_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'employer', // name of Target model
-                key: 'employer_Id', // key in Target model that we're referencing
+                model: "users",
+                key: "id",
             },
-
         },
         title: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        company_name: {
+        company: {
             type: DataTypes.STRING,
-            allowNull: false,
-        },
-        description: {
-            type: DataTypes.TEXT,
             allowNull: false,
         },
         location: {
@@ -53,37 +50,68 @@ Job.init(
             allowNull: false,
         },
         job_type: {
-            type: DataTypes.ENUM("Full-time", "Part-time", "Remote", "Contract", "Internship"),
+            type: DataTypes.ENUM("full-time", "part-time", "contract", "internship"),
+            allowNull: false,
+        },
+        location_type: {
+            type: DataTypes.ENUM("remote", "on-site", "hybrid"),
             allowNull: false,
         },
         salary_min: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
         salary_max: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
-        location_type: {
-            type: DataTypes.STRING,
+        description: {
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         requirements: {
             type: DataTypes.TEXT,
-            allowNull: true,
-        },
-        isACTIVE: {
-            type: DataTypes.ENUM("Open", "Closed"),
             allowNull: false,
         },
-        
+        posted_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        expires_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: DataTypes.NOW
+        },
+        is_active:{
+          type :DataTypes.BOOLEAN, 
+          allowNull :false, 
+          defaultValue :true
+         },
+        view_count:{
+          type :DataTypes.INTEGER, 
+          allowNull :false, 
+          defaultValue :0
+         },
+         created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
     },
+    updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+     },
   {
     // Other model options go here
     sequelize, // We need to pass the connection instance
       modelName: "Job", // We need to choose the model name
       timestamps: true,
-     tableName: "job"
+     tableName: "jobs",      // 👈 MUST MATCH DB
+     freezeTableName: true,
+       underscored: true,   
   }
 );
 

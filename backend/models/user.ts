@@ -2,13 +2,12 @@ import { Sequelize, DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize";
 
 class User extends Model {
-   id!: number;
-    firstName!: string;
-    lastName!: string;
+    id!: number;
     email!: string;
     password!: string;
-    role!: "Employer" | "Jobseeker";
-
+    name! :string;
+    role!: "employer" | "jobseeker";
+    company_name! :string 
 }
 
 User.init(
@@ -20,16 +19,10 @@ User.init(
             autoIncrement: true,
             allowNull: false
         },
-      
-        firstName: {
+        name:{
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        lastName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            // allowNull defaults to true
-        },
+    },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -43,19 +36,28 @@ User.init(
             type: DataTypes.ENUM("employer", "jobseeker"),
             allowNull: false,
         },
-        companyName: {
+        company_name: {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        createdAt: {
+        created_at: {
             type: DataTypes.DATE,
             allowNull: false,
             defaultValue: DataTypes.NOW,
         },
-        updatedAt: {
+        updated_at: {
             type: DataTypes.DATE,
             allowNull: false,
             defaultValue: DataTypes.NOW,
+        },
+        last_login: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true,
         },
     },
   {
@@ -64,7 +66,9 @@ User.init(
       modelName: "User", // We need to choose the model name
       timestamps: true,
      tableName: "users",      // 👈 MUST MATCH DB
-     freezeTableName: true,   
+     freezeTableName: true,
+     createdAt: "created_at",
+     updatedAt: "updated_at",  
   }
 );
 

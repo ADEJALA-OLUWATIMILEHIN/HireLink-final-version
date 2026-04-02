@@ -1,109 +1,60 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
 import Application from "../models/application";
+import { uploadSingleFile } from "../middleware/upload";
 import Job from "../models/job";
-import Jobseeker from "../models/jobseeker";
+import User from "../models/user";
 
-const router = express.Router();
 
-// Create application
-// router.post("/", authenticate, async (req: Request, res: Response) => {
-//     const { id, role } = req.user;
-//     const { job_Id } = req.body;
 
-//     if (role !== "jobseeker") {
-//         return res.status(403).json({
-//             message: "Forbidden: Only jobseekers can apply for jobs"
-//         });
-//     }
+ const router = express.Router();
+ router.post("/apply/:job_id", authenticate, uploadSingleFile, async (req: Request, res: Response) => {
+    const { id, role } = req.user; // From your auth middleware
+    const { job_id } = req.params;
+    const { cover_letter, notes } = req.body;
 
-//     try {
-//         const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
-//         if (!jobseeker) {
-//             return res.status(404).json({
-//                 message: "Jobseeker profile not found"
-//             });
-//         }
-
-//         const job = await Job.findByPk(job_Id);
-//         if (!job) {
-//             return res.status(404).json({
-//                 message: "Job not found"
-//             });
-//         }
-
-//         const existingApplication = await Application.findOne({
-//             where: {
-//                 job_Id,
-//                 jobseeker_Id: jobseeker.jobseeker_Id
-//             }
-//         });
-
-//         if (existingApplication) {
-//             return res.status(409).json({
-//                 message: "Already applied for this job"
-//             });
-//         }
-
-//         const application = await Application.create({
-//             job_Id,
-//             jobseeker_Id: jobseeker.jobseeker_Id
-//         });
-
-//         return res.status(201).json({
-//             message: "Application submitted successfully",
-//             application
-//         });
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: "Internal server error",
-//             error
-//         });
-//     }
-// });
-
-// Create application
-router.post("/:job_Id", authenticate, async (req: Request, res: Response) => {
-    const { id, role } = req.user;
-    const { job_Id } = req.params;
-    const{ resume_url, cover_letter,notes} = req.body;
+    // 1. Role Validation
     if (role !== "jobseeker") {
-        return res.status(403).json({
-            message: "Forbidden: Only jobseekers can apply for jobs"
-        });
+        return res.status(403).json({ message: "Forbidden: Only jobseekers can apply" });
     }
 
     try {
-        const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
+        // 2. Fetch Jobseeker Profile
+        // Ensure 'user_Id' matches your database column name
+        const jobseeker = await User.findOne({ where: { id: id } });
         if (!jobseeker) {
-            return res.status(404).json({
-                message: "Jobseeker profile not found"
-            });
+            return res.status(404).json({ message: "Jobseeker profile not found" });
         }
 
-        const job = await Job.findByPk(job_Id);
+        // 3. Check if Job exists
+        const job = await Job.findByPk(job_id);
         if (!job) {
-            return res.status(404).json({
-                message: "Job not found"
-            });
+            return res.status(404).json({ message: "Job not found" });
         }
 
+        // 4. Handle File Upload
+        if (!req.file) {
+            return res.status(400).json({ message: "Please upload a resume" });
+        }
+        const resume_url = `/uploads/${req.file.filename}`;
+
+        // 5. Prevent Duplicate Applications
+        // IMPORTANT: Check if your model uses jobseeker_Id or job_seeker_Id
         const existingApplication = await Application.findOne({
             where: {
-                job_Id,
-                jobseeker_Id: jobseeker.jobseeker_Id
+                job_id: job_id,
+                job_seeker_Id: jobseeker.id
             }
         });
 
         if (existingApplication) {
-            return res.status(409).json({
-                message: "Already applied for this job"
-            });
+            return res.status(409).json({ message: "You have already applied for this job" });
         }
 
+        // 6. Create Application
         const application = await Application.create({
-            job_Id: job_Id,
-           jobseeker_Id: jobseeker.jobseeker_Id,
+            job_id,
+            jobseeker_Id: jobseeker.id,
             resume_url,
             cover_letter,
             notes
@@ -113,19 +64,19 @@ router.post("/:job_Id", authenticate, async (req: Request, res: Response) => {
             message: "Application submitted successfully",
             application
         });
+
     } catch (error) {
+        console.error(error);
         return res.status(500).json({
-            message: "Internal server error",
-            error
+            message: "Internal server error"
         });
     }
 });
 
-
 // Get applications for a job (employer)
-router.get("/job/:jobId", authenticate, async (req: Request, res: Response) => {
+router.get("/job/:job_id", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { jobId } = req.params;
+    const { job_id } = req.params;
 
     if (role !== "employer") {
         return res.status(403).json({
@@ -134,23 +85,23 @@ router.get("/job/:jobId", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
-        const job = await Job.findByPk(jobId);
+        const job = await Job.findByPk(job_id);
         if (!job) {
             return res.status(404).json({
                 message: "Job not found"
             });
         }
 
-        if (job.employer_Id !== id) {
+        if (job.employer_id !== id) {
             return res.status(403).json({
                 message: "Forbidden: You can only view applications for your own jobs"
             });
         }
 
         const applications = await Application.findAll({
-            where: { job_Id: jobId },
+            where: { job_Id: job_id },
             include: [{
-                model: Jobseeker,
+                model: User,
                 as: 'jobseeker'
             }],
             order: [['createdAt', 'DESC']]
@@ -179,7 +130,7 @@ router.get("/my-applications", authenticate, async (req: Request, res: Response)
     }
 
     try {
-        const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
+        const jobseeker = await User.findOne({ where: { id: id } });
         if (!jobseeker) {
             return res.status(404).json({
                 message: "Jobseeker profile not found"
@@ -187,7 +138,7 @@ router.get("/my-applications", authenticate, async (req: Request, res: Response)
         }
 
         const applications = await Application.findAll({
-            where: { jobseeker_Id: jobseeker.jobseeker_Id },
+            where: { job_seeker_id: jobseeker.id },
             include: [{
                 model: Job,
                 as: 'job'
@@ -235,7 +186,7 @@ router.put("/:applicationId/status", authenticate, async (req: Request, res: Res
             });
         }
 
-        if (application.job.employer_Id !== id) {
+        if (application.job.employer_id !== id) {
             return res.status(403).json({
                 message: "Forbidden: You can only update applications for your own jobs"
             });

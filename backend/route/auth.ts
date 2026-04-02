@@ -8,10 +8,10 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 
 router.post("/register",async(req:Request,res:Response)=>{
-    const {firstName, lastName, email, password,role} = req.body;
+    const {email,password,name,role,company_name,} = req.body;
 
     // Registration logic goes here
-    if(!firstName || !lastName || !email || !password || !role){
+    if(!email || !password || !role  || !name || (role === "employer" && !company_name)){
         return res.status(400).json({
             message: "All fields are required"
         })
@@ -25,19 +25,18 @@ router.post("/register",async(req:Request,res:Response)=>{
         // }
       
          const  hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({
-          firstName,
-          lastName,
-          email,
-          password :hashedPassword
-            ,role
+          const newUser = await User.create({
+            email,
+            password: hashedPassword,
+            name,
+            role,
+            company_name: role === "employer" ? company_name : null
         });
       
         const editedResponse ={
-          id: newUser.id,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          email: newUser.email
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email
         }
       
         return res.status(201).json({
@@ -55,19 +54,20 @@ router.post("/register",async(req:Request,res:Response)=>{
 
 
 router.post("/login",async(req:Request,res:Response)=>{
-    const {email, password} = req.body;
+    const {email, password,role} = req.body;
 
     // Login logic goes here
-    if(!email || !password){
+    if(!email || !password || !role){
         return res.status(400).json({
             message: "Email and password are required"
         })
     }
+   
     try{
-        const user = await User.findOne({where: {email}});
+        const user = await User.findOne({where: {email, role}});
         if(!user){
           return res.status(400).json({
-            message: "Invalid email or password"
+            message: "Invalid email or role"
           })
         }
       
@@ -96,7 +96,38 @@ router.post("/login",async(req:Request,res:Response)=>{
         })
       }
 });    
-     // either these
+
+
+  router.put("/:id/reset-password", async(req: Request, res: Response) => {
+      const{password} = req.body;
+      const{id} = req.params;
+      if(!password){
+        return res.status(400).json({
+          message: "Password is required"
+        })
+      }
+      try{
+    const hashedPassword  = await bcrypt.hash(password, 10);
+    const user = await User.findByPk(id);
+   if(!user){
+        return res.status(404).json({
+          message: "User not found"
+        });
+      }
+      user.password = hashedPassword;
+       await user.save();  
+       return res.status(200).json({
+        message: "Password reset successful"
+      });
+    } catch(error){
+      console.log(error);
+      return res.status(500).json({
+        message: "Internal server error",
+        error: error
+      })
+    }
+});
+       // either these
 // router.post("/login", async (req: Request, res: Response) => {
 //   const {email, password} = req.body;
   
@@ -127,4 +158,5 @@ router.post("/login",async(req:Request,res:Response)=>{
 //         email: user.email,
 //       }, token });
 //   })
+
 export default router;

@@ -2,15 +2,15 @@ import express, { Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
 import Bookmark from "../models/bookmark";
 import Job from "../models/job";
-import Jobseeker from "../models/jobseeker";
+import User from "../models/user";
+
 
 const router = express.Router();
 
 // Create bookmark
-router.post("/", authenticate, async (req: Request, res: Response) => {
+router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { job_Id } = req.body;
-
+    const { jobid :job_id} = req.params;
     if (role !== "jobseeker") {
         return res.status(403).json({
             message: "Forbidden: Only jobseekers can bookmark jobs"
@@ -19,7 +19,7 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
 
     try {
         // Get jobseeker_Id from user_Id
-        const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
+        const jobseeker = await User.findOne({ where: { id: id } });
         if (!jobseeker) {
             return res.status(404).json({
                 message: "Jobseeker profile not found"
@@ -27,7 +27,7 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
         }
 
         // Check if job exists
-        const job = await Job.findByPk(job_Id);
+        const job = await Job.findByPk(job_id);
         if (!job) {
             return res.status(404).json({
                 message: "Job not found"
@@ -37,8 +37,8 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
         // Check if already bookmarked
         const existingBookmark = await Bookmark.findOne({
             where: {
-                job_Id,
-                jobseeker_Id: jobseeker.jobseeker_Id
+                job_id,
+                job_seeker_id : jobseeker.id
             }
         });
 
@@ -49,8 +49,8 @@ router.post("/", authenticate, async (req: Request, res: Response) => {
         }
 
         const bookmark = await Bookmark.create({
-            job_Id,
-            jobseeker_Id: jobseeker.jobseeker_Id
+            job_id,
+            jobseeker_Id: jobseeker.id
         });
 
         return res.status(201).json({
@@ -76,7 +76,7 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
-        const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
+        const jobseeker = await User.findOne({ where: { user_id: id } });
         if (!jobseeker) {
             return res.status(404).json({
                 message: "Jobseeker profile not found"
@@ -84,7 +84,7 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
         }
 
         const bookmarks = await Bookmark.findAll({
-            where: { jobseeker_Id: jobseeker.jobseeker_Id },
+            where: { jobseeker_Id: jobseeker.id },
             include: [{
                 model: Job,
                 as: 'job'
@@ -105,9 +105,9 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
 });
 
 // Remove bookmark
-router.delete("/:job_Id", authenticate, async (req: Request, res: Response) => {
+router.delete("/:job_id", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { job_Id } = req.params;
+    const { job_id } = req.params;
 
     if (role !== "jobseeker") {
         return res.status(403).json({
@@ -116,17 +116,10 @@ router.delete("/:job_Id", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
-        const jobseeker = await Jobseeker.findOne({ where: { user_Id: id } });
-        if (!jobseeker) {
-            return res.status(404).json({
-                message: "Jobseeker profile not found"
-            });
-        }
-
         const bookmark = await Bookmark.findOne({
             where: {
-                job_Id: parseInt(job_Id),
-                jobseeker_Id: jobseeker.jobseeker_Id
+                job_id: parseInt(job_id),
+                job_seeker_id: User.findOne({ where: { id: id } })
             }
         });
 

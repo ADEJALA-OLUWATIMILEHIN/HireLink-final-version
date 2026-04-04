@@ -185,7 +185,7 @@ router.get("/search", async (req: Request, res: Response) => {
     const { title, location, job_type, salary_min, salary_max } = req.query;
 
     try {
-        const whereClause: any = { is_active: true };
+        const whereClause: any = { is_active: true }; 
 
         if (title) {
             whereClause.title = { [Op.iLike]: `%${title}%` };

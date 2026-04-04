@@ -43,7 +43,7 @@ import User from "../models/user";
         const existingApplication = await Application.findOne({
             where: {
                 job_id: job_id,
-                job_seeker_Id: jobseeker.id
+                job_seeker_id: jobseeker.id
             }
         });
 
@@ -53,8 +53,8 @@ import User from "../models/user";
 
         // 6. Create Application
         const application = await Application.create({
-            job_id,
-            jobseeker_Id: jobseeker.id,
+            job_id:job_id,
+            job_seeker_id: jobseeker.id,
             resume_url,
             cover_letter,
             notes

@@ -1,3 +1,5 @@
+
+**HIRELINK**
 HireLink | Full-Stack Job Career Platform
 HireLink is a robust job portal designed to bridge the gap between employers and job seekers. Built with the PERN stack (PostgreSQL, Express, React, Node.js), it features a scalable architecture, secure authentication, and a seamless UI/UX for managing job applications and listings.
 
@@ -54,7 +56,7 @@ Clone the repository
 
 Bash
 
-git clone https://github.com/yourusername/HireLink.git
+git clone https://github.com/ADEJALA-OLUWATIMILEHIN/HireLink.git
 cd HireLink
 Backend Setup
 

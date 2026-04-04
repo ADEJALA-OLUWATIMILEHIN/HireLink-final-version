@@ -143,7 +143,7 @@ router.get("/my-applications", authenticate, async (req: Request, res: Response)
                 model: Job,
                 as: 'job'
             }],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
 
         return res.status(200).json({

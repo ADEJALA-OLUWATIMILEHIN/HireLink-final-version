@@ -121,7 +121,7 @@ router.get("/jobseeker", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
-        const jobseeker = await User.findOne({ where: { user_Id: id } });
+        const jobseeker = await User.findOne({ where: { id: id } });
         if (!jobseeker) {
             return res.status(404).json({
                 message: "Jobseeker profile not found"

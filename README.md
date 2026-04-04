@@ -1,127 +1,104 @@
-# HireLink
 
-HireLink is a job recruitment platform designed to connect job seekers with potential employers. It features secure authentication, comprehensive profile management, and streamlined job application workflows.
+**HIRELINK**
+HireLink | Full-Stack Job Career Platform
+HireLink is a robust job portal designed to bridge the gap between employers and job seekers. Built with the PERN stack (PostgreSQL, Express, React, Node.js), it features a scalable architecture, secure authentication, and a seamless UI/UX for managing job applications and listings.
 
-## Tech Stack
+🚀 Features
+For Job Seekers
+Dynamic Job Discovery: Search and filter jobs by location, type, and salary range.
 
-* **Backend:** Node.js, Express.js, TypeScript
-* **Frontend:** React.js TailwindCSS, TypeScript
-* **Database:** PostgreSQL (via Neon), Sequelize ORM
-* **Authentication:** JWT (JSON Web Tokens)
-* **Deployment:** Render
-* **Version Control:** Git & GitHub
+Application Management: Track application statuses (Pending, Reviewed, Accepted, Rejected) in real-time.
 
-## Features
+Resume Hosting: Integrated file uploads via Multer and cloud storage.
 
-* **User Authentication:** Secure Sign up/Login for Job Seekers and Employers using JWT.
-* **Role-Based Access:** Distinct workflows for Job Seekers (apply for jobs) and Employers (post jobs).
-* **Profile Management:** Create and update profiles with resumes, contact details, and professional summaries.
-* **Secure Data:** Password hashing with bcrypt and environment variable protection.
+For Employers
+Job Lifecycle Management: Create, update, and archive job postings.
 
----
+Applicant Tracking System (ATS): Review applicant profiles and manage recruitment workflows.
 
-## Getting Started
+Analytics: Basic insights into job view counts and application volume.
 
-Follow these steps to set up the project locally on your machine.
+🛠️ Tech Stack
+Frontend
+React.js: Functional components with Hooks for state management.
 
-### Prerequisites
+Tailwind CSS: For responsive and utility-first styling.
 
-* Node.js (v18 or higher recommended)
-* PostgreSQL (Local installation or a Cloud URL like Neon)
-* Git
+Axios: Interceptors for handling global API configurations and JWT injection.
 
-### 1. Clone the Repository
+Backend
+Node.js & Express: Clean MVC (Model-View-Controller) architecture.
 
-```bash
-git clone [https://github.com/Koded0214h/HireLink.git](https://github.com/Koded0214h/HireLink.git)
+Sequelize ORM: Advanced PostgreSQL modeling with associations and migrations.
+
+JWT & Bcrypt: Secure authentication and password hashing.
+
+Multer: Middleware for handling multipart/form-data (file uploads).
+
+Database
+PostgreSQL: Relational database for complex data integrity (Jobs ↔ Applications ↔ Users).
+
+🏗️ Architectural Decisions
+Database Normalization: Leveraged relational mapping to ensure data consistency between users and job entities.
+
+Error Handling: Implemented a global error-handling middleware in Express to catch SequelizeDatabaseError and file upload errors gracefully.
+
+Security: Implemented CORS policies and environment variable protection for sensitive API keys and DB credentials.
+
+🚦 Getting Started
+Prerequisites
+Node.js (v16+)
+
+PostgreSQL
+
+Installation
+Clone the repository
+
+Bash
+
+git clone https://github.com/ADEJALA-OLUWATIMILEHIN/HireLink.git
 cd HireLink
-```
+Backend Setup
 
-### 2. Install Dependencies
+Bash
 
-```bash
+cd backend
 npm install
-```
+Create a .env file in the backend folder:
 
-### 3. Configure Environment Variables
+Code snippet
 
-For Local Development (Standard):
-
-```bash
 PORT=5000
-NODE_ENV=development
-JWT_SECRET=your_super_secret_key_here
+DB_NAME=hirelink_db
+DB_USER=postgres
+DB_PASS=yourpassword
+JWT_SECRET=your_super_secret_key
+Frontend Setup
 
-DATABASE_HOST=127.0.0.1
-DATABASE_USER=postgres
-DATABASE_PASSWORD=your_local_db_password
-DATABASE_NAME=hirelink_db
-DATABASE_PORT=5432
-For Production / Cloud DB: If you want to run locally but connect to the Neon cloud database:
+Bash
 
-DATABASE_URL="postgres://neondb_owner:password@pa-hot-frog.us-west-1.aws.neon.tech/neondb?sslmode=require"
-```
-
-### 4. Database Setup & Migration
-
-```bash
-npx sequelize-cli db:migrate
-```
-
-### 5. Build and Run
-
-Development Mode:
-
-```bash
-npm run dev
-npx nodemon
-```
-
-Production Build:
-
-```bash
-npm run build
+cd ../frontend
+npm install
 npm start
-```
+📈 Future Roadmap
+[ ] Real-time Notifications: Using Socket.io for application updates.
 
-## API Endpoints
+[ ] AI Job Matching: Suggested jobs based on user skills.
 
-### Authentication
-POST /api/auth/signup - Register a new user (Jobseeker/Employer)
+[ ] Advanced Analytics: Dashboard for employers to see hiring trends.
 
-POST /api/auth/login - Login and receive a JWT token
+🤝 Contributing
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
-### Job Seekers
-GET /api/jobseekers - Get all job seekers (Protected Route)
+Fork the Project
 
-POST /api/jobseekers - Create/Update profile (Protected Route)
+Create your Feature Branch (git checkout -b feature/AmazingFeature)
 
-### Employers
-POST /api/jobs - Post a new job listing (Protected)
+Commit your Changes (git commit -m 'Add some AmazingFeature')
 
-GET /api/jobs - View all job listings
+Push to the Branch (git push origin feature/AmazingFeature)
 
-## Deployment
-This project is configured for seamless deployment on Render.
+Open a Pull Request
 
-Connect your GitHub repository to Render.
-
-Root Directory: backend (if you have a monorepo) or leave blank if root.
-
-Build Command: npm install && npm run build
-
-Start Command: npx sequelize-cli db:migrate && node dist/index.js
-
-Environment Variables:
-
-DATABASE_URL: (Your Neon Connection String)
-
-JWT_SECRET: (A strong random string)
-
-NODE_ENV: production
-
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
-
-## License
-This project is licensed under the MIT License.
+Developed with ❤️ by ADEJALA TIMILEHIN
+University of Lagos | Computer Science

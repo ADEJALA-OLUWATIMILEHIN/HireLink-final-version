@@ -1,6 +1,42 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize";
-
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     RegisterRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *         - name
+ *         - role
+ *       properties:
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *         name:
+ *           type: string
+ *         role:
+ *           type: string
+ *         company_name:
+ *           type: string
+ *
+ *     user:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         email:
+ *           type: string
+ *         name:
+ *           type: string
+ *         role:
+ *           type: string
+ *         company_name:
+ *           type: string
+ */
 class User extends Model {
     id!: number;
     email!: string;

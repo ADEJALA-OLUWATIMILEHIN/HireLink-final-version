@@ -2,10 +2,44 @@ import express ,{Request, Response}from "express";
 import User from "../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
 
 
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/v1/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user with email, password, name, role and company name (if employer)
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/RegisterRequest"
+ *           example:
+ *             email: obasanyagala@gmail.com
+ *             password: obasanya234
+ *             name: Emminent Obasanya
+ *             role: employer
+ *             company_name: Microsoft
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/user"
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
 
 router.post("/register",async(req:Request,res:Response)=>{
     const {email,password,name,role,company_name,} = req.body;
@@ -51,7 +85,48 @@ router.post("/register",async(req:Request,res:Response)=>{
       }
       });
 
-
+/**
+ * @swagger
+ * /api/v1/auth/login:
+ *   post:
+ *     summary: Login a user
+ *     description: Login a user with email, password and role
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - role
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 example: employer
+ *           example:
+ *             email: obasanyagala@gmail.com
+ *             password: obasanya234
+ *             role: employer
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/user"
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
 
 router.post("/login",async(req:Request,res:Response)=>{
     const {email, password,role} = req.body;
@@ -96,6 +171,50 @@ router.post("/login",async(req:Request,res:Response)=>{
         })
       }
 });    
+
+  /**
+ * @swagger
+ * /api/v1/auth/{id}/reset-password:
+ *   put:
+ *     summary: Reset user password
+ *     description: Reset a user's password using user ID
+ *     tags:
+ *       - Auth
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: newPassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password updated successfully
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
 
 
   router.put("/:id/reset-password", async(req: Request, res: Response) => {

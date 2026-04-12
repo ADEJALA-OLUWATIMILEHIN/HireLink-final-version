@@ -18,7 +18,12 @@ import swaggerJSDoc from "swagger-jsdoc";
 const app = express();
 
 app.use(express.json());
-app.use(cors())
+
+app.use(cors({
+  origin: "http://localhost:5173", // or your deployed frontend
+  credentials: true
+}));
+
 const options = {
   definition: {
     openapi: "3.0.0",

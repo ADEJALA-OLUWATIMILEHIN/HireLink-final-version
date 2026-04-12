@@ -2,8 +2,7 @@ import express ,{Request, Response}from "express";
 import User from "../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import swaggerUi from "swagger-ui-express";
-import swaggerJSDoc from "swagger-jsdoc";
+
 
 
 

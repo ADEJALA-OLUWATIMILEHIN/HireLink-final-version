@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { X, Upload, CheckCircle, FileText } from "lucide-react";
+import { applyForJob } from "../api/JobseekerApi/applicationsApi";
 
 interface ApplyModalProps {
+  jobId: number;
   jobTitle: string;
   companyName: string;
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface ApplyModalProps {
 }
 
 const ApplyModal = ({
+  jobId,
   jobTitle,
   companyName,
   isOpen,
@@ -16,6 +19,9 @@ const ApplyModal = ({
 }: ApplyModalProps) => {
   const [step, setStep] = useState(1);
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [coverLetter, setCoverLetter] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
@@ -25,16 +31,27 @@ const ApplyModal = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cvFile) {
       alert("Please upload your Resume/CV before submitting.");
       return;
     }
 
-    setTimeout(() => {
+    setIsSubmitting(true);
+    setMessage("");
+    const result = await applyForJob(jobId, {
+      resume: cvFile,
+      coverLetter,
+    });
+    setIsSubmitting(false);
+
+    if (result.ok) {
       setStep(2);
-    }, 1000);
+      return;
+    }
+
+    setMessage(result.message);
   };
 
   return (
@@ -152,17 +169,22 @@ const ApplyModal = ({
               <textarea
                 required
                 rows={4}
+                value={coverLetter}
+                onChange={(event) => setCoverLetter(event.target.value)}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none"
                 placeholder="Tell us why you're a great fit..."
               />
             </div>
 
+            {message && <p className="text-sm text-red-600">{message}</p>}
+
             <div className="pt-2">
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
               >
-                Submit Application
+                {isSubmitting ? "Submitting..." : "Submit Application"}
               </button>
             </div>
           </form>

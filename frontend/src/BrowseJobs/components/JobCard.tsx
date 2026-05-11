@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { MapPin, Briefcase, DollarSign, Bookmark} from "lucide-react";
+import { addBookmark, removeBookmark } from "../../api/BookmarkApi/BookmarkApi";
 
 // Define the shape of the job object
 interface Job {
@@ -21,6 +22,19 @@ interface JobCardProps {
 
 export const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const navigate = useNavigate();
+  const [isBookmarked, setIsBookmarked] = React.useState(job.is_bookmarked);
+
+  const handleBookmarkClick = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    const result = isBookmarked
+      ? await removeBookmark(job.id)
+      : await addBookmark(job.id);
+
+    if (result.ok || result.message === "Job already bookmarked") {
+      setIsBookmarked(!isBookmarked);
+    }
+  };
 
   return (
     <div
@@ -60,9 +74,14 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
         </div>
 
-        <div className="flex gap-2 px-2 py-2 mt-2 md:mt-0 hover:bg-teal-500 hover:text-white transition hover:rounded-sm">
-          {job.is_bookmarked === true ? <Bookmark className="w-4 h-4 text-indigo-500 fill-indigo-500" /> : <Bookmark className="w-4 h-4" />}
-        </div>
+        <button
+          type="button"
+          onClick={handleBookmarkClick}
+          className="flex gap-2 px-2 py-2 mt-2 md:mt-0 hover:bg-teal-500 hover:text-white transition hover:rounded-sm"
+          title={isBookmarked ? "Remove bookmark" : "Bookmark job"}
+        >
+          {isBookmarked ? <Bookmark className="w-4 h-4 text-indigo-500 fill-indigo-500" /> : <Bookmark className="w-4 h-4" />}
+        </button>
       </div>
     </div>
   );

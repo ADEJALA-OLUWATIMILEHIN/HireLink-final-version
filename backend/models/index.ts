@@ -20,21 +20,21 @@ const models  = {
 
 
 // Employer-Job associations
-User.hasMany(Job, { foreignKey: 'employer_Id', as: 'jobs' });
-Job.belongsTo(User, { foreignKey: 'employer_Id', as: 'employer' });
+User.hasMany(Job, { foreignKey: 'employer_id', as: 'jobs' });
+Job.belongsTo(User, { foreignKey: 'employer_id', as: 'employer' });
 
 // Job-Bookmark associations
-Job.hasMany(Bookmark, { foreignKey: 'job_Id', as: 'bookmarks' });
-Bookmark.belongsTo(Job, { foreignKey: 'job_Id', as: 'job' });
+Job.hasMany(Bookmark, { foreignKey: 'job_id', as: 'bookmarks' });
+Bookmark.belongsTo(Job, { foreignKey: 'job_id', as: 'job' });
 
-User.hasMany(Bookmark, { foreignKey: 'jobseeker_Id', as: 'bookmarks' });
-Bookmark.belongsTo(User, { foreignKey: 'jobseeker_Id', as: 'jobseeker' });
+User.hasMany(Bookmark, { foreignKey: 'job_seeker_id', as: 'bookmarks' });
+Bookmark.belongsTo(User, { foreignKey: 'job_seeker_id', as: 'jobSeeker' });
 
 // Job-Application associations
-Job.hasMany(Application, { foreignKey: 'job_Id', as: 'applications' });
-Application.belongsTo(Job, { foreignKey: 'job_Id', as: 'job' });
+Job.hasMany(Application, { foreignKey: 'job_id', as: 'applications' });
+Application.belongsTo(Job, { foreignKey: 'job_id', as: 'job' });
 
-User.hasMany(Application, { foreignKey: 'jobseeker_Id', as: 'applications' });
-Application.belongsTo(User, { foreignKey: 'jobseeker_Id', as: 'jobseeker' });
+User.hasMany(Application, { foreignKey: 'job_seeker_id', as: 'applications' });
+Application.belongsTo(User, { foreignKey: 'job_seeker_id', as: 'jobSeeker' });
 export {sequelize}
 export default models;

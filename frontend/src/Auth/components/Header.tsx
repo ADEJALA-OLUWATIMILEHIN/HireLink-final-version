@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
               >
                 Browse Jobs
               </Link>
-              <Link
+    <Link
                 to="/login"
                 className="px-3 py-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-teal-500 hover:text-white transition text-sm font-medium whitespace-nowrap"
               >

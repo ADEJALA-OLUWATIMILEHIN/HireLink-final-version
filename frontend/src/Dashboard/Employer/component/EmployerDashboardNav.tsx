@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { Briefcase, Building2, LogOut, Menu, X } from 'lucide-react';
+import { useEmployerProfile } from '../../../api/EmployerApi/profileApi';
 
-interface HeaderProps {
-    userName?: string;
-    userEmail?: string;
-}
 
-export const EmployerDashboardNav: React.FC<HeaderProps> = ({
-    userName = "Sarah Johnson",
-    userEmail = "user@example.com"
-}) => {
+export const EmployerDashboardNav: React.FC= () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { data} = useEmployerProfile()
+    
+      const userName = data?.name 
+     const userEmail = data?.email
 
     return (
         // Changed 'relative' to 'sticky top-0 z-50' to make it stick to the top
@@ -51,7 +49,7 @@ export const EmployerDashboardNav: React.FC<HeaderProps> = ({
                             </button>
                             <button className="p-1 rounded-md text-gray-800 hover:bg-teal-500 hover:text-white transition ml-1">
                                 <LogOut className="w-5 h-6" />
-                            </button>
+                            </button>     
                         </div>
                     </div>
 

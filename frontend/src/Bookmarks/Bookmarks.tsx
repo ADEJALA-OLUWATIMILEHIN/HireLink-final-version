@@ -1,64 +1,27 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MapPin, Briefcase, DollarSign } from "lucide-react";
 import { JobCard } from "../BrowseJobs/components/JobCard"
 
 import { Header } from "../Components/Header"
 import { Footer } from "../Components/Footer"
-
-
-
-const bookmarkedJobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "TechCorp Inc",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$120,000 - $160,000",
-    posted: "12/10/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 3,
-    title: "Full Stack Engineer",
-    company: "StartupXYZ",
-    location: "New York, NY",
-    type: "Full-time",
-    salary: "$100,000 - $140,000",
-    posted: "12/8/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 5,
-    title: "DevOps Engineer",
-    company: "TechCorp Inc",
-    location: "Remote",
-    type: "Remote",
-    salary: "$110,000 - $150,000",
-    posted: "12/11/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 6,
-    title: "Data Analyst",
-    company: "DataDriven Co",
-    location: "Boston, MA",
-    type: "Full-time",
-    salary: "$70,000 - $95,000",
-    posted: "12/9/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-];
+import { getBookmarks } from "../api/BookmarkApi/BookmarkApi"
+import type { Job } from "../api/EmployerApi/GetJobs"
 
 
 const Bookmarks = () => {
+  const [bookmarkedJobs, setBookmarkedJobs] = useState<Job[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [message, setMessage] = useState("")
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      const result = await getBookmarks()
+      setBookmarkedJobs(result.jobs.map((job) => ({ ...job, is_bookmarked: true })))
+      setMessage(result.ok ? "" : result.message)
+      setIsLoading(false)
+    }
+
+    loadBookmarks()
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -73,6 +36,11 @@ const Bookmarks = () => {
         </div>
 
         <div className="space-y-4">
+          {isLoading && <p className="text-slate-500 text-lg">Loading saved jobs...</p>}
+          {!isLoading && message && <p className="text-red-600 text-lg">{message}</p>}
+          {!isLoading && bookmarkedJobs.length === 0 && !message && (
+            <p className="text-slate-500 text-lg">You have not bookmarked any jobs yet.</p>
+          )}
           {/* 2. Use the component inside the map */}
           {bookmarkedJobs.map((job) => (
             <JobCard key={job.id} job={job} />

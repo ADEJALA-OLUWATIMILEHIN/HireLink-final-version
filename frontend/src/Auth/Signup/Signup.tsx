@@ -4,7 +4,7 @@ import { Header } from "../../Components/Header";
 import { Footer } from "../../Components/Footer";
 import { Briefcase } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { signUpApi } from "../../api/authAPI/signUpApi";
+import { SignUpApi } from "../../api/authAPI/signUpApi";
 
 
 const Signup: React.FC = () => {
@@ -16,11 +16,11 @@ const Signup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [companyName, setCompanyName] = useState("");
+  const [name, setname] = useState("");
+  const [company_name, setCompany_name] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message,setMessage] = useState(" ")
 
   const handleSignup = async(e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +29,14 @@ const Signup: React.FC = () => {
     const userPayload =
       userType === "employer"
         ? {
-            firstName: companyName,
-            lastName: "Null",
+            name,
+            company_name,
             email,
             password,
             role: "employer",
           }
         : {
-            firstName,
-            lastName,
+            name,
             email,
             password,
             role: "jobseeker",
@@ -47,9 +46,10 @@ const Signup: React.FC = () => {
 
     // Call api
     try {
-      const res = await signUpApi(userPayload)
+      const res = await SignUpApi(userPayload)
 
       console.log(res)
+      setMessage(res.message);
       navigate('/login')
 
       setIsLoading(false)
@@ -122,47 +122,50 @@ const Signup: React.FC = () => {
             {/* Name Section */}
             {userType === "employer" ? (
               <div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Company Name
                 </label>
                 <input
                   required
                   type="text"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
+                  value={company_name}
+                  onChange={(e) => setCompany_name(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                   placeholder="Tech Corp LLC"
                 />
               </div>
+               <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">
+                   Name
+               </label>
+               <input
+                 required
+                 type="text"
+                 value={name}
+                 onChange={(e) => setname(e.target.value)}
+                 className="w-full px-4 py-2 bg-gray-50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                 placeholder="Tech Corp LLC"
+               />
+             </div>
+             </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              // <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
+                    Name
                   </label>
                   <input
                     required
                     type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-4 py-2 bg-gray-50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    placeholder="John"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    value={name}
+                    onChange={(e) => setname(e.target.value)}
                     className="w-full px-4 py-2 bg-gray-50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                     placeholder="Doe"
                   />
                 </div>
-              </div>
+        //      </div>
             )}
 
             {/* Email */}
@@ -206,6 +209,7 @@ const Signup: React.FC = () => {
                 ? "Create Employer Account"
                 : "Create Job Seeker Account"}
             </button>
+            <p className='text-red-600 text-center'>{message}</p>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">

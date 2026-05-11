@@ -1,10 +1,17 @@
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+
+const uploadDir = path.resolve(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // 1. Define where and how to store the file
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Make sure this folder exists in your root!
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     // Give the file a unique name to avoid overwriting
@@ -15,14 +22,15 @@ const storage = multer.diskStorage({
 
 // 2. Define the filter (PDF, JPG, PNG only)
 const fileFilter = (req: any, file: any, cb: any) => {
-  const allowedTypes = /jpeg|jpg|png|pdf/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+  const allowedExtensions = /jpeg|jpg|png|pdf|doc|docx/;
+  const allowedMimeTypes = /jpeg|jpg|png|pdf|msword|officedocument/;
+  const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedMimeTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb(new Error("Only .png, .jpg, .jpeg and .pdf formats are allowed!"));
+    cb(new Error("Only .png, .jpg, .jpeg, .pdf, .doc and .docx formats are allowed!"));
   }
 };
 

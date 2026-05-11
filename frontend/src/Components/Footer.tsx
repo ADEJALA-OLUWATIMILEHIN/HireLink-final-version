@@ -39,7 +39,7 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link to="/browse-jobs" className="hover:text-gray-900">
+                <Link to="/jobs" className="hover:text-gray-900">
                   Browse Jobs
                 </Link>
               </li>
@@ -56,12 +56,12 @@ export const Footer: React.FC = () => {
             <h3 className="font-semibold text-gray-900 mb-4">For Employers</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link to="/post-job" className="hover:text-gray-900">
+                <Link to="/employer/new-job" className="hover:text-gray-900">
                   Post a Job
                 </Link>
               </li>
               <li>
-                <Link to="/employer-login" className="hover:text-gray-900">
+                <Link to="/login" className="hover:text-gray-900">
                   Employer Login
                 </Link>
               </li>

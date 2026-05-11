@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { type EmployerDashboardStats, type StatusBreakdown } from "../types"
 import { StatCard } from "../JobSeeker/components/StatCard"
 import { Briefcase, FileSliders, TrendingUp, Users } from "lucide-react"
@@ -6,15 +6,19 @@ import { ApplicationStatusBreakdown } from "../JobSeeker/components/ApplicationS
 import ActionButton from "./component/ActionButton"
 import RecentlyPostedJobs from "./component/RecentlyPostedJobs"
 import { Link } from "react-router-dom";
+import { useEmployerProfile } from "../../api/EmployerApi/profileApi"
+import { getEmployerDashboardStats } from "../../api/EmployerApi/dashboardApi"
+
+
 
 
 
 const EmployerDashboard = () => {
-    const [stats] = useState<EmployerDashboardStats>({
-        activeJobs: 3,
-        totalApplicants: 3,
-        totalJobPosted: 1,
-        shortlisted: 1
+    const [stats, setStats] = useState<EmployerDashboardStats>({
+        activeJobs: 0,
+        totalApplicants: 0,
+        totalJobPosted: 0,
+        shortlisted: 0
     })
 
     const [statusData] = useState<StatusBreakdown>({
@@ -24,12 +28,22 @@ const EmployerDashboard = () => {
         hired: 0,
     });
 
-    const user = { userName: "Sarah Johnson", companyName: "TechCorp Inc" }
+    const {data} = useEmployerProfile();
+
+    useEffect(() => {
+        const loadStats = async () => {
+            const result = await getEmployerDashboardStats();
+            setStats(result.stats);
+        };
+
+        loadStats();
+    }, []);
+
     return (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <section className="mt-5 mb-8">
-                <h1 className="text-2xl font-medium text-gray-800 mb-2">Welcome back, {user.userName}!</h1>
-                <p className="text-gray-600">{user.companyName} Dashboard </p>
+                <h1 className="text-2xl font-medium text-gray-800 mb-2">Welcome back, {data?.name}!</h1>
+                <p className="text-gray-600">{data?.company_name} Dashboard </p>
             </section>
 
             {/* Stats Card */}

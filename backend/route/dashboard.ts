@@ -30,7 +30,8 @@ router.get("/employerinfo", authenticate, async (req: Request, res: Response) =>
         return res.status(200).json({
             message: "Employer info retrieved successfully",
             name: employer.name,
-            email: employer.email
+            email: employer.email,
+            company_name : employer.company_name
         });
     } catch (error) {
         return res.status(500).json({
@@ -169,12 +170,12 @@ router.get("/recentapplications", authenticate, async (req: Request, res: Respon
 
         const applications = await Application.findAll({
             limit: 3,
-            where: { jobseeker_id: jobseeker.id },
+            where: { job_seeker_id: jobseeker.id },
             include: [{
                 model: Job,
                 as: 'job'
             }],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
 
         return res.status(200).json({

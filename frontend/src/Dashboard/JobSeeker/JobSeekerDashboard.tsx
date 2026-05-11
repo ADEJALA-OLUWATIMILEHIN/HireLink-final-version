@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FileText, TrendingUp, Bookmark, Briefcase } from "lucide-react";
 import { StatCard } from "./components/StatCard";
 import { ApplicationStatusBreakdown } from "./components/ApplicationStatusBreakdown";
 import { RecentApplications } from "./components/RecentApplications";
 import type { DashboardStats, StatusBreakdown, Application } from "../types";
+import { useJobseekerProfile } from "../../api/JobseekerApi/profileApi";
+import { getRecentApplications } from "../../api/JobseekerApi/recentApplicationsApi";
 
 const JobSeekerDashboard: React.FC = () => {
   const [stats] = useState<DashboardStats>({
@@ -20,38 +22,29 @@ const JobSeekerDashboard: React.FC = () => {
     hired: 0,
   });
 
-  const [recentApplications] = useState<Application[]>([
-    {
-      id: "1",
-      jobTitle: "Senior Frontend Developer",
-      company: "TechCorp Inc",
-      appliedDate: "12/11/2024",
-      status: "Shortlisted",
-    },
-    {
-      id: "2",
-      jobTitle: "Full Stack Engineer",
-      company: "StartupXYZ",
-      appliedDate: "12/9/2024",
-      status: "Applied",
-    },
-    {
-      id: "3",
-      jobTitle: "DevOps Engineer",
-      company: "TechCorp Inc",
-      appliedDate: "12/12/2024",
-      status: "Applied",
-    },
-  ]);
+  const [recentApplications, setRecentApplications] = useState<Application[]>([]);
+  const [isRecentApplicationsLoading, setIsRecentApplicationsLoading] = useState(true);
+  const [recentApplicationsMessage, setRecentApplicationsMessage] = useState("");
 
-  const user = { name: "John Doe", email: "john@example.com" };
+  const {data} = useJobseekerProfile();
+
+  useEffect(() => {
+    const loadRecentApplications = async () => {
+      const result = await getRecentApplications();
+      setRecentApplications(result.applications);
+      setRecentApplicationsMessage(result.ok ? "" : result.message);
+      setIsRecentApplicationsLoading(false);
+    };
+
+    loadRecentApplications();
+  }, []);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-800 mb-2">
-          Welcome back, {user.name}!
+          Welcome back, {data?.name}!
         </h1>
         <p className="text-gray-600">Here's your job search overview</p>
       </div>
@@ -87,7 +80,11 @@ const JobSeekerDashboard: React.FC = () => {
 
       {/* Recent Applications */}
       <div className="mb-6">
-        <RecentApplications applications={recentApplications} />
+        <RecentApplications
+          applications={recentApplications}
+          isLoading={isRecentApplicationsLoading}
+          message={recentApplicationsMessage}
+        />
       </div>
     </div>
   );

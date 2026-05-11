@@ -44,8 +44,7 @@ Bookmark.init(
         sequelize,
         modelName: "Bookmark",
         tableName: "bookmarks",
-        timestamps: true,
-        updatedAt: false,
+        timestamps: false,
     }
 );
 

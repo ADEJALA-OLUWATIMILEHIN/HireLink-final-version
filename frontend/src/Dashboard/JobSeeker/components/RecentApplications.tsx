@@ -6,9 +6,15 @@ import { Link } from 'react-router-dom';
 
 interface RecentApplicationsProps {
   applications: Application[];
+  isLoading?: boolean;
+  message?: string;
 }
 
-export const RecentApplications: React.FC<RecentApplicationsProps> = ({ applications }) => {
+export const RecentApplications: React.FC<RecentApplicationsProps> = ({
+  applications,
+  isLoading = false,
+  message = "",
+}) => {
   const getStatusColor = (status: Application['status']) => {
     switch (status) {
       case 'Applied':
@@ -30,7 +36,7 @@ export const RecentApplications: React.FC<RecentApplicationsProps> = ({ applicat
           <div className="px-6 py-5 flex items-center justify-between">
               <h2 className="text-base font-semibold text-gray-900">Recent Applications</h2>
               <Link
-                  to="/applications"
+                  to="/jobseeker/applications"
                   className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-teal-500 hover:text-white transition-colors"
               >
                   View All
@@ -40,6 +46,18 @@ export const RecentApplications: React.FC<RecentApplicationsProps> = ({ applicat
 
           {/* List Section */}
           <div className="flex flex-col">
+              {isLoading && (
+                  <p className="px-6 pb-6 text-sm text-gray-500">Loading recent applications...</p>
+              )}
+
+              {!isLoading && message && (
+                  <p className="px-6 pb-6 text-sm text-red-600">{message}</p>
+              )}
+
+              {!isLoading && !message && applications.length === 0 && (
+                  <p className="px-6 pb-6 text-sm text-gray-500">No recent applications yet.</p>
+              )}
+
               {applications.map((app, index) => (
                   <div key={app.id}>
                       <div className="p-6">

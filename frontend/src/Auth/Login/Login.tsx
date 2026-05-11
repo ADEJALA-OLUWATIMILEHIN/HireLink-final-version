@@ -9,12 +9,13 @@ const Login: React.FC = () => {
   // User type toggle
   const [userType, setUserType] = useState<'jobseeker' | 'employer'>('jobseeker');
 
+
   const navigate = useNavigate();
 
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [errorMessage,setErrorMessage]= useState('');
   // Loading state
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,12 +26,13 @@ const Login: React.FC = () => {
     const payload = {
       email,
       password,
+      role : userType,
     };
 
     try {
       const res = await loginApi(payload);
       console.log(res);
-
+      setErrorMessage(res.message);
       if (res.message === 'success' && res.role === 'jobseeker') {
         navigate('/jobseeker');
       }
@@ -127,7 +129,9 @@ const Login: React.FC = () => {
               className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-2.5 rounded-lg transition-colors duration-200"
             >
               {isLoading ? 'Logging in...' : 'Login'}
+              
             </button>
+            <p className='text-red-600 text-center'>{errorMessage}</p>
           </form>
 
           {/* Sign Up Link */}

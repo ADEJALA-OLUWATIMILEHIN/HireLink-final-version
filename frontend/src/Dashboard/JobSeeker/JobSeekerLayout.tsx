@@ -8,9 +8,21 @@ import {
 } from "lucide-react";
 import { Header } from "../../Components/Header";
 import { Footer } from "../../Components/Footer";
+import { useJobseekerProfile } from "../../api/JobseekerApi/profileApi";
 
 const JobSeekerLayout = () => {
   const location = useLocation();
+  const { data } = useJobseekerProfile();
+  const userName = data?.name ?? "";
+  const userEmail = data?.email ?? "";
+  const initials =
+    userName
+      .split(" ")
+      .filter(Boolean)
+      .map((name) => name[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "JS";
 
   const isActive = (path: string) => {
     if (path === "/jobseeker" && location.pathname === "/jobseeker")
@@ -31,7 +43,7 @@ const JobSeekerLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
-      <Header />
+      <Header userName={userName} userEmail={userEmail} />
 
       <main className="grow max-w-7xl mx-auto w-full px-6 py-8">
         <div className="flex flex-col md:flex-row gap-8">
@@ -39,9 +51,11 @@ const JobSeekerLayout = () => {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden sticky top-24">
               <div className="p-6 border-b border-slate-100 bg-slate-50">
                 <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl mb-3">
-                  JP
+                  {initials}
                 </div>
-                <h3 className="font-bold text-slate-900">John Paul</h3>
+                <h3 className="font-bold text-slate-900">
+                  {userName || "Job Seeker"}
+                </h3>
                 <p className="text-sm text-slate-500">Job Seeker</p>
               </div>
 

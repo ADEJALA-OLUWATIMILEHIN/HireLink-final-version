@@ -1,9 +1,14 @@
-import React from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 
 
-const ActionButton = ({className, label} : {className: string, label: string}) => {
+type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  className: string;
+  label: string;
+};
+
+const ActionButton = ({className, label, ...props} : ActionButtonProps) => {
   return (
-    <button className={`${className} px-5 py-2 rounded-md cursor-pointer`}>{label}</button>
+    <button {...props} className={`${className} px-5 py-2 rounded-md cursor-pointer`}>{label}</button>
   )
 }
 

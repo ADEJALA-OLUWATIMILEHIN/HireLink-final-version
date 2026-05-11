@@ -1,16 +1,35 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
 import Application from "../models/application";
 import { uploadSingleFile } from "../middleware/upload";
 import Job from "../models/job";
 import User from "../models/user";
+import multer from "multer";
 
 
 
  const router = express.Router();
- router.post("/apply/:job_id", authenticate, uploadSingleFile, async (req: Request, res: Response) => {
+
+ const handleResumeUpload = (req: Request, res: Response, next: NextFunction) => {
+    uploadSingleFile(req, res, (error: unknown) => {
+        if (!error) {
+            return next();
+        }
+
+        const message =
+            error instanceof multer.MulterError
+                ? error.message
+                : error instanceof Error
+                    ? error.message
+                    : "Resume upload failed";
+
+        return res.status(400).json({ message });
+    });
+ };
+
+ router.post("/apply/:job_id", authenticate, handleResumeUpload, async (req: Request, res: Response) => {
     const { id, role } = req.user; // From your auth middleware
-    const { job_id } = req.params;
+    const jobId = Number(req.params.job_id);
     const { cover_letter, notes } = req.body;
 
     // 1. Role Validation
@@ -27,7 +46,7 @@ import User from "../models/user";
         }
 
         // 3. Check if Job exists
-        const job = await Job.findByPk(job_id);
+        const job = await Job.findByPk(jobId);
         if (!job) {
             return res.status(404).json({ message: "Job not found" });
         }
@@ -42,7 +61,7 @@ import User from "../models/user";
         // IMPORTANT: Check if your model uses jobseeker_Id or job_seeker_Id
         const existingApplication = await Application.findOne({
             where: {
-                job_id: job_id,
+                job_id: jobId,
                 job_seeker_id: jobseeker.id
             }
         });
@@ -53,7 +72,7 @@ import User from "../models/user";
 
         // 6. Create Application
         const application = await Application.create({
-            job_id:job_id,
+            job_id: jobId,
             job_seeker_id: jobseeker.id,
             resume_url,
             cover_letter,
@@ -76,7 +95,7 @@ import User from "../models/user";
 // Get applications for a job (employer)
 router.get("/job/:job_id", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { job_id } = req.params;
+    const jobId = Number(req.params.job_id);
 
     if (role !== "employer") {
         return res.status(403).json({
@@ -85,7 +104,7 @@ router.get("/job/:job_id", authenticate, async (req: Request, res: Response) => 
     }
 
     try {
-        const job = await Job.findByPk(job_id);
+        const job = await Job.findByPk(jobId);
         if (!job) {
             return res.status(404).json({
                 message: "Job not found"
@@ -99,12 +118,12 @@ router.get("/job/:job_id", authenticate, async (req: Request, res: Response) => 
         }
 
         const applications = await Application.findAll({
-            where: { job_Id: job_id },
+            where: { job_id: jobId },
             include: [{
                 model: User,
-                as: 'jobseeker'
+                as: 'jobSeeker'
             }],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
 
         return res.status(200).json({
@@ -163,7 +182,7 @@ router.get("/my-applications", authenticate, async (req: Request, res: Response)
 // Update application status (employer)
 router.put("/:applicationId/status", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { applicationId } = req.params;
+    const applicationId = Number(req.params.applicationId);
     const { status } = req.body;
 
     if (role !== "employer") {
@@ -186,7 +205,7 @@ router.put("/:applicationId/status", authenticate, async (req: Request, res: Res
             });
         }
 
-        if (application.job.employer_id !== id) {
+        if ((application as any).job.employer_id !== id) {
             return res.status(403).json({
                 message: "Forbidden: You can only update applications for your own jobs"
             });

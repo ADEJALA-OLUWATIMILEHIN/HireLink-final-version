@@ -8,8 +8,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  userName = "John Doe",
-  userEmail = "user@example.com",
+  userName = "Job Seeker",
+  userEmail = "",
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -101,19 +101,19 @@ export const Header: React.FC<HeaderProps> = ({
               Browse Jobs
             </Link>
             <Link
-              to="/dashboard"
+              to="/jobseeker"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 bg-gray-50"
             >
               Dashboard
             </Link>
             <Link
-              to="/applications"
+              to="/jobseeker/applications"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             >
               Applications
             </Link>
             <Link
-              to="/bookmarks"
+              to="/jobseeker/bookmarks"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             >
               Bookmarks

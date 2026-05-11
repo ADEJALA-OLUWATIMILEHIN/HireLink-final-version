@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ApplyModal from "../Components/ApplyModal";
 import {
   MapPin,
@@ -14,98 +14,101 @@ import {
 import { Header } from "../Components/Header.tsx";
 import { Footer } from "../Components/Footer.tsx";
 
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "TechCorp Inc",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$120,000 - $160,000",
-    posted: "12/10/2024",
-    status: "Open",
-    description:
-      "We are looking for an experienced Frontend Developer to join our team. You will be responsible for building responsive web applications using modern frameworks.",
-    requirements:
-      "5+ years of experience with React, TypeScript, and modern CSS. Strong understanding of web performance and accessibility.",
-  },
-  {
-    id: 2,
-    title: "Product Designer",
-    company: "DesignHub",
-    location: "Remote",
-    type: "Remote",
-    salary: "$90,000 - $130,000",
-    posted: "12/12/2024",
-    status: "Open",
-    description:
-      "Join our design team to create beautiful and intuitive user experiences for our SaaS product.",
-    requirements:
-      "3+ years of product design experience. Proficient in Figma, user research, and design systems.",
-  },
-  {
-    id: 3,
-    title: "Full Stack Engineer",
-    company: "StartupXYZ",
-    location: "New York, NY",
-    type: "Full-time",
-    salary: "$100,000 - $140,000",
-    posted: "12/8/2024",
-    status: "Open",
-    description:
-      "Build and maintain scalable web applications. Work across the entire stack from database to UI.",
-    requirements:
-      "Experience with Node.js, React, PostgreSQL. Understanding of cloud infrastructure (AWS/GCP).",
-  },
-  {
-    id: 4,
-    title: "Marketing Manager",
-    company: "GrowthCo",
-    location: "Austin, TX",
-    type: "Full-time",
-    salary: "$80,000 - $110,000",
-    posted: "12/14/2024",
-    status: "Open",
-    description:
-      "Lead our marketing initiatives and develop strategies to grow our user base.",
-    requirements:
-      "4+ years in B2B SaaS marketing. Experience with content marketing, SEO, and analytics.",
-  },
-  {
-    id: 5,
-    title: "DevOps Engineer",
-    company: "TechCorp Inc",
-    location: "Remote",
-    type: "Remote",
-    salary: "$110,000 - $150,000",
-    posted: "12/11/2024",
-    status: "Open",
-    description:
-      "Manage and improve our cloud infrastructure. Implement CI/CD pipelines and monitoring systems.",
-    requirements:
-      "Strong experience with Kubernetes, Docker, and cloud platforms. Knowledge of IaC tools like Terraform.",
-  },
-  {
-    id: 6,
-    title: "Data Analyst",
-    company: "DataDriven Co",
-    location: "Boston, MA",
-    type: "Full-time",
-    salary: "$70,000 - $95,000",
-    posted: "12/9/2024",
-    status: "Open",
-    description:
-      "Analyze data to provide actionable insights for business decisions.",
-    requirements:
-      "SQL, Python, data visualization tools (Tableau/PowerBI). Statistics background preferred.",
-  },
-];
+interface ApiJob {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  job_type: string;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  posted_at?: string;
+  created_at?: string;
+  is_active?: boolean;
+  description: string;
+  requirements: string;
+}
+
+interface Job {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary: string;
+  posted: string;
+  status: string;
+  description: string;
+  requirements: string;
+}
+
+const formatJobType = (jobType: string) =>
+  jobType
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
+
+const formatSalary = (min?: number | null, max?: number | null) => {
+  if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+  if (min) return `From $${min.toLocaleString()}`;
+  if (max) return `Up to $${max.toLocaleString()}`;
+  return "Not specified";
+};
+
+const formatDate = (date?: string) => {
+  if (!date) return "Recently";
+
+  return new Date(date).toLocaleDateString();
+};
+
+const mapJob = (job: ApiJob): Job => ({
+  id: job.id,
+  title: job.title,
+  company: job.company,
+  location: job.location,
+  type: formatJobType(job.job_type),
+  salary: formatSalary(job.salary_min, job.salary_max),
+  posted: formatDate(job.posted_at ?? job.created_at),
+  status: job.is_active === false ? "Closed" : "Open",
+  description: job.description,
+  requirements: job.requirements,
+});
 
 const EachJob = () => {
   const { id } = useParams<{ id: string }>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [job, setJob] = useState<Job | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const job = jobs.find((j) => j.id === Number(id));
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const res = await fetch(`http://localhost:3005/api/v1/jobs/${id}`);
+        const data = await res.json();
+
+        setJob(res.ok && data.job ? mapJob(data.job) : null);
+      } catch (error) {
+        console.log(error);
+        setJob(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchJob();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white">
+        <Header />
+        <div className="grow flex items-center justify-center">
+          <p className="text-slate-500 text-lg">Loading job...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!job) {
     return (
@@ -225,6 +228,7 @@ const EachJob = () => {
 
       <Footer />
       <ApplyModal
+        jobId={job.id}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         jobTitle={job.title}

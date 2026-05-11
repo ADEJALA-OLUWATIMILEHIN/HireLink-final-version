@@ -3,14 +3,19 @@ import { authenticate } from "../middleware/auth";
 import Bookmark from "../models/bookmark";
 import Job from "../models/job";
 import User from "../models/user";
-
-
 const router = express.Router();
 
 // Create bookmark
 router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { jobid :job_id} = req.params;
+    const jobId = Number(req.params.jobid);
+
+    if (!Number.isInteger(jobId)) {
+        return res.status(400).json({
+            message: "Invalid job id"
+        });
+    }
+
     if (role !== "jobseeker") {
         return res.status(403).json({
             message: "Forbidden: Only jobseekers can bookmark jobs"
@@ -27,7 +32,7 @@ router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
         }
 
         // Check if job exists
-        const job = await Job.findByPk(job_id);
+        const job = await Job.findByPk(jobId);
         if (!job) {
             return res.status(404).json({
                 message: "Job not found"
@@ -37,7 +42,7 @@ router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
         // Check if already bookmarked
         const existingBookmark = await Bookmark.findOne({
             where: {
-                job_id,
+                job_id: jobId,
                 job_seeker_id : jobseeker.id
             }
         });
@@ -49,8 +54,9 @@ router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
         }
 
         const bookmark = await Bookmark.create({
-            job_id,
-            jobseeker_Id: jobseeker.id
+            job_id: jobId,
+            job_seeker_id: jobseeker.id,
+            created_at: new Date()
         });
 
         return res.status(201).json({
@@ -58,6 +64,7 @@ router.post("/:jobid", authenticate, async (req: Request, res: Response) => {
             bookmark
         });
     } catch (error) {
+        console.error("Bookmark create error:", error);
         return res.status(500).json({
             message: "Internal server error",
             error
@@ -76,7 +83,7 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
-        const jobseeker = await User.findOne({ where: { user_id: id } });
+        const jobseeker = await User.findOne({ where: { id } });
         if (!jobseeker) {
             return res.status(404).json({
                 message: "Jobseeker profile not found"
@@ -84,12 +91,12 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
         }
 
         const bookmarks = await Bookmark.findAll({
-            where: { jobseeker_Id: jobseeker.id },
+            where: { job_seeker_id: jobseeker.id },
             include: [{
                 model: Job,
                 as: 'job'
             }],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
 
         return res.status(200).json({
@@ -107,7 +114,13 @@ router.get("/", authenticate, async (req: Request, res: Response) => {
 // Remove bookmark
 router.delete("/:job_id", authenticate, async (req: Request, res: Response) => {
     const { id, role } = req.user;
-    const { job_id } = req.params;
+    const jobId = Number(req.params.job_id);
+
+    if (!Number.isInteger(jobId)) {
+        return res.status(400).json({
+            message: "Invalid job id"
+        });
+    }
 
     if (role !== "jobseeker") {
         return res.status(403).json({
@@ -116,10 +129,17 @@ router.delete("/:job_id", authenticate, async (req: Request, res: Response) => {
     }
 
     try {
+        const jobseeker = await User.findOne({ where: { id } });
+        if (!jobseeker) {
+            return res.status(404).json({
+                message: "Jobseeker profile not found"
+            });
+        }
+
         const bookmark = await Bookmark.findOne({
             where: {
-                job_id: parseInt(job_id),
-                job_seeker_id: User.findOne({ where: { id: id } })
+                job_id: jobId,
+                job_seeker_id: jobseeker.id
             }
         });
 
@@ -135,6 +155,7 @@ router.delete("/:job_id", authenticate, async (req: Request, res: Response) => {
             message: "Bookmark removed successfully"
         });
     } catch (error) {
+        console.error("Bookmark delete error:", error);
         return res.status(500).json({
             message: "Internal server error",
             error

@@ -1,17 +1,26 @@
-export const signUpApi = async (data: any) => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+export const SignUpApi = async (data: any) => {
+  const baseUrl = "http://localhost:3005/api/v1";
+
   try {
-    const res = await fetch(`${baseUrl}/auth/register`, {
+    const res = await fetch(`${baseUrl}/register`, {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
-    console.log(res)
-    return "Successful"
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null);
+      const errorMessage = errorBody?.message ?? "Something went wrong. Try again later";
+      return { message: errorMessage, role: "null" };
+    }
+
+    const msg = await res.json();
+    return { message: "success", role: msg?.role ?? data.role };
+
   } catch (error) {
-    return "An Error Occured. Try again please"
+    console.error("[SignUpApi] Unexpected error:", error);
+    return { message: "An error occurred. Try again later", role: "null" };
   }
 };

@@ -1,85 +1,30 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Briefcase, DollarSign } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
 import { JobCard } from "./components/JobCard"; // 1. Import the component
 import { Header } from "../Components/Header";
 import { Footer } from "../Components/Footer";
-
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "TechCorp Inc",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    salary: "$120,000 - $160,000",
-    posted: "12/10/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 2,
-    title: "Product Designer",
-    company: "DesignHub",
-    location: "Remote",
-    type: "Remote",
-    salary: "$90,000 - $130,000",
-    posted: "12/12/2024",
-    status: "Open",
-    is_bookmarked: false,
-  },
-  {
-    id: 3,
-    title: "Full Stack Engineer",
-    company: "StartupXYZ",
-    location: "New York, NY",
-    type: "Full-time",
-    salary: "$100,000 - $140,000",
-    posted: "12/8/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 4,
-    title: "Marketing Manager",
-    company: "GrowthCo",
-    location: "Austin, TX",
-    type: "Full-time",
-    salary: "$80,000 - $110,000",
-    posted: "12/14/2024",
-    status: "Open",
-    is_bookmarked: false,
-  },
-  {
-    id: 5,
-    title: "DevOps Engineer",
-    company: "TechCorp Inc",
-    location: "Remote",
-    type: "Remote",
-    salary: "$110,000 - $150,000",
-    posted: "12/11/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-  {
-    id: 6,
-    title: "Data Analyst",
-    company: "DataDriven Co",
-    location: "Boston, MA",
-    type: "Full-time",
-    salary: "$70,000 - $95,000",
-    posted: "12/9/2024",
-    status: "Open",
-    is_bookmarked: true,
-  },
-];
+import { GetJobs, type Job } from "../api/EmployerApi/GetJobs";
 
 const AllJobs = () => {
-  const navigate = useNavigate();
-
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("All Locations");
   const [typeFilter, setTypeFilter] = useState("All Types");
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setIsLoading(true);
+      const data = await GetJobs();
+
+      setJobs(data.jobs);
+      setError(data.ok ? "" : data.message);
+      setIsLoading(false);
+    };
+
+    fetchJobs();
+  }, []);
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -152,13 +97,25 @@ const AllJobs = () => {
         </p>
 
         <div className="space-y-4">
+          {isLoading && (
+            <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+              <p className="text-slate-500 text-lg">Loading jobs...</p>
+            </div>
+          )}
+
+          {!isLoading && error && (
+            <div className="text-center py-20 bg-red-50 rounded-xl border border-dashed border-red-200">
+              <p className="text-red-600 text-lg">{error}</p>
+            </div>
+          )}
+
           {/* 2. Use the component inside the map */}
-          {filteredJobs.map((job) => (
+          {!isLoading && !error && filteredJobs.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}
 
           {/* Empty state */}
-          {filteredJobs.length === 0 && (
+          {!isLoading && !error && filteredJobs.length === 0 && (
             <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
               <p className="text-slate-500 text-lg">
                 No jobs found matching your criteria.

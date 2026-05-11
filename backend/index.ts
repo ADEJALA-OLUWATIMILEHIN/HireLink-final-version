@@ -45,7 +45,7 @@ const options = {
 const SwaggerSpec = swaggerJSDoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(SwaggerSpec));
 
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1", authRouter);
  app.use("/api/v1/jobs",jobRouter);
 app.use("/api/v1/application",applicationRouter);
 app.use("/api/v1/bookmarks",bookmarkRouter);
@@ -67,7 +67,7 @@ app.get("/", (req: Request, res: Response) => {
 }
 );
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3005;
 
 app.listen(PORT, '0.0.0.0', async() => {
   await sequelize.authenticate();

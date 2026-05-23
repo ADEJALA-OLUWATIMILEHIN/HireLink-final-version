@@ -48,3 +48,4 @@ export const  getRecentlyPostedJobs =(id)=> {
     return { data, isLoading, error }
 }
 }
+}

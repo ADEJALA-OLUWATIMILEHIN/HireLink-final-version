@@ -15,11 +15,11 @@ export const postNewJobFormSchema = z.object({
     .string({ message: "Please fill this field." })
     .trim(),
 
-  job_type: z.enum(["full-time", "part-time", "remote", "contract"], {
+  job_type: z.enum(["full-time", "part-time", "contract"], {
     message: "Please select a job type",
   }),
 
-  location_type: z.enum(["onsite", "remote", "hybrid"], {
+  location_type: z.enum(["on-site", "remote", "hybrid"], {
     message: "Please select location type",
   }),
 

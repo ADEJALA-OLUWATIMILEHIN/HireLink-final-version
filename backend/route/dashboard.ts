@@ -212,13 +212,13 @@ router.get("/applicationstatus", authenticate, async (req: Request, res: Respons
             where: { job_seeker_id: jobseeker.id, status: "pending" }
         });
         const shortlisted = await Application.count({
-            where: { jobseeker_Id: jobseeker.id, status: "reviewed" }
+            where: { job_seeker_id: jobseeker.id, status: "reviewed" }
         });
         const rejected = await Application.count({
-            where: { jobseeker_Id: jobseeker.id, status: "rejected" }
+            where: { job_seeker_id: jobseeker.id, status: "rejected" }
         });
         const hired = await Application.count({
-            where: { jobseeker_Id: jobseeker.id, status: "accepted" }
+            where: { job_seeker_id: jobseeker.id, status: "accepted" }
         });
 
         return res.status(200).json({

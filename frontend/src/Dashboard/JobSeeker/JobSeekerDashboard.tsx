@@ -7,26 +7,83 @@ import type { DashboardStats, StatusBreakdown, Application } from "../types";
 import { useJobseekerProfile } from "../../api/JobseekerApi/profileApi";
 import { getRecentApplications } from "../../api/JobseekerApi/recentApplicationsApi";
 
+const baseUrl = "http://localhost:3005/api/v1";
+
+const initialStats: DashboardStats = {
+  totalApplications: 0,
+  shortlisted: 0,
+  bookmarkedJobs: 0,
+  profileCompletion: 0,
+};
+
+const initialStatusData: StatusBreakdown = {
+  applied: 0,
+  shortlisted: 0,
+  rejected: 0,
+  hired: 0,
+};
+
+const authHeaders = () => ({
+  Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+});
+
 const JobSeekerDashboard: React.FC = () => {
-  const [stats] = useState<DashboardStats>({
-    totalApplications: 3,
-    shortlisted: 1,
-    bookmarkedJobs: 2,
-    profileCompletion: 100,
-  });
+  const [stats, setStats] = useState<DashboardStats>(initialStats);
+  const [statusStats, setStatusStats] =
+    useState<StatusBreakdown>(initialStatusData);
+  const [recentApplications, setRecentApplications] = useState<Application[]>(
+    []
+  );
+  const [isRecentApplicationsLoading, setIsRecentApplicationsLoading] =
+    useState(true);
+  const [recentApplicationsMessage, setRecentApplicationsMessage] =
+    useState("");
 
-  const [statusData] = useState<StatusBreakdown>({
-    applied: 2,
-    shortlisted: 1,
-    rejected: 0,
-    hired: 0,
-  });
+  const { data } = useJobseekerProfile();
 
-  const [recentApplications, setRecentApplications] = useState<Application[]>([]);
-  const [isRecentApplicationsLoading, setIsRecentApplicationsLoading] = useState(true);
-  const [recentApplicationsMessage, setRecentApplicationsMessage] = useState("");
+  useEffect(() => {
+    const loadDashboardStats = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/dashboard/jobseeker`, {
+          headers: authHeaders(),
+        });
+        const result = await response.json();
 
-  const {data} = useJobseekerProfile();
+        setStats({
+          totalApplications: result.stats?.totalApplications ?? 0,
+          shortlisted: result.stats?.shortlisted ?? 0,
+          bookmarkedJobs: result.stats?.totalBookmarks ?? 0,
+          profileCompletion: result.stats?.profileCompletion ?? 0,
+        });
+      } catch (err) {
+        console.error("Error fetching dashboard stats:", err);
+      }
+    };
+
+    loadDashboardStats();
+  }, []);
+
+  useEffect(() => {
+    const loadStatusBreakdown = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/dashboard/applicationstatus`, {
+          headers: authHeaders(),
+        });
+        const result = await response.json();
+
+        setStatusStats({
+          applied: result.statusBreakdown?.applied ?? 0,
+          shortlisted: result.statusBreakdown?.shortlisted ?? 0,
+          rejected: result.statusBreakdown?.rejected ?? 0,
+          hired: result.statusBreakdown?.hired ?? 0,
+        });
+      } catch (err) {
+        console.error("Error fetching application status breakdown:", err);
+      }
+    };
+
+    loadStatusBreakdown();
+  }, []);
 
   useEffect(() => {
     const loadRecentApplications = async () => {
@@ -41,15 +98,13 @@ const JobSeekerDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-800 mb-2">
-          Welcome back, {data?.name}!
+          Welcome back, {data?.name ?? "Jobseeker"}!
         </h1>
         <p className="text-gray-600">Here's your job search overview</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Applications"
@@ -73,12 +128,10 @@ const JobSeekerDashboard: React.FC = () => {
         />
       </div>
 
-      {/* Status Breakdown */}
       <div className="mb-8">
-        <ApplicationStatusBreakdown statusData={statusData} />
+        <ApplicationStatusBreakdown statusData={statusStats} />
       </div>
 
-      {/* Recent Applications */}
       <div className="mb-6">
         <RecentApplications
           applications={recentApplications}

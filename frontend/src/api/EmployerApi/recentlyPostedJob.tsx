@@ -1,11 +1,13 @@
 import { useState,useEffect } from "react"
 
 
-interface id {
-    
+interface EmployerProfile {
+    name: string
+    email: string
+    company_name: string
 }
 
-export const  getRecentlyPostedJobs =(id)=> {
+export const getRecentlyPostedJobs = (_id: number) => {
     const baseUrl = "http://localhost:3005"
     const token = localStorage.getItem("jwt")
 
@@ -46,6 +48,4 @@ export const  getRecentlyPostedJobs =(id)=> {
     }, [])
 
     return { data, isLoading, error }
-}
-}
 }

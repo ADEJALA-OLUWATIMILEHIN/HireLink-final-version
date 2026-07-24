@@ -32,7 +32,7 @@ module.exports = {
         allowNull: false
       },
      job_type: {
-        type: Sequelize.ENUM('full-time', 'part-time', 'contract'),
+        type: Sequelize.ENUM('full-time', 'part-time', 'contract', 'internship'),
         allowNull: false
        },
       location_type: {
@@ -48,6 +48,10 @@ module.exports = {
         allowNull: true
       },
       description: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
+      requirements: {
         type: Sequelize.TEXT,
         allowNull: false
       },

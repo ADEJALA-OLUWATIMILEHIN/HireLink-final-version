@@ -13,11 +13,13 @@ import dashboardRouter from "./route/dashboard";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
+import path from "path";
 
 
 const app = express();
 
 app.use(express.json());
+app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 app.use(cors({
   origin: "http://localhost:5173", // or your deployed frontend
@@ -34,7 +36,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:3005",
         description: "Development server"
       }
     ]
@@ -67,7 +69,7 @@ app.get("/", (req: Request, res: Response) => {
 }
 );
 
-const PORT = 3005;
+const PORT = Number(process.env.PORT) || 3005;
 
 app.listen(PORT, '0.0.0.0', async() => {
   await sequelize.authenticate();

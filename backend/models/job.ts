@@ -111,7 +111,11 @@ Job.init(
       timestamps: true,
      tableName: "jobs",      // 👈 MUST MATCH DB
      freezeTableName: true,
-       underscored: true,   
+     underscored: true,
+     // The database uses snake_case timestamp columns. Explicit mappings avoid
+     // Sequelize selecting both `created_at` and its default `createdAt` alias.
+     createdAt: "created_at",
+     updatedAt: "updated_at",
   }
 );
 

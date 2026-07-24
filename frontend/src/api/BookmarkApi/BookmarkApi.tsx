@@ -60,7 +60,6 @@ export const removeBookmark = async (jobId: number) => {
       headers: authHeaders(),
     });
     const data = await response.json();
-
     return {
       ok: response.ok,
       message: data.message ?? "Bookmark removed",

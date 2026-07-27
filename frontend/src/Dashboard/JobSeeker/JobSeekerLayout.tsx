@@ -75,7 +75,12 @@ const JobSeekerLayout = () => {
                   </Link>
                 ))}
 
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors mt-4">
+                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors mt-4"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                  }}
+                  >
                   <LogOut className="w-5 h-5" />
                   Sign Out
                 </button>

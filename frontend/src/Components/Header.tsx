@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, User, LogOut, Menu, X } from "lucide-react";
 
 interface HeaderProps {
@@ -12,6 +12,13 @@ export const Header: React.FC<HeaderProps> = ({
   userEmail = "",
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwt");
+    setIsMenuOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -67,7 +74,12 @@ export const Header: React.FC<HeaderProps> = ({
                   {userName}
                 </span>
               </button>
-              <button className="p-1 rounded-md text-gray-800 hover:bg-teal-500 hover:text-white transition ml-1">
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Log out"
+                className="p-1 rounded-md text-gray-800 hover:bg-teal-500 hover:text-white transition ml-1"
+              >
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -135,7 +147,12 @@ export const Header: React.FC<HeaderProps> = ({
                   {userEmail}
                 </div>
               </div>
-              <button className="ml-auto flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500">
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label="Log out"
+                className="ml-auto flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500"
+              >
                 <LogOut className="h-6 w-6" />
               </button>
             </div>

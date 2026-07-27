@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import { Briefcase, Building2, LogOut, Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useEmployerProfile } from '../../../api/EmployerApi/profileApi';
 
 
 export const EmployerDashboardNav: React.FC= () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
     const { data} = useEmployerProfile()
     
       const userName = data?.name 
      const userEmail = data?.email
+
+    const handleLogout = () => {
+        localStorage.removeItem("jwt");
+        setIsMenuOpen(false);
+        navigate("/login", { replace: true });
+    };
 
     return (
         // Changed 'relative' to 'sticky top-0 z-50' to make it stick to the top
@@ -47,7 +55,7 @@ export const EmployerDashboardNav: React.FC= () => {
                             <button className="text-gray-600 hover:text-gray-900">
                                 <span className="text-md text-gray-800 font-medium ml-2">{userName}</span>
                             </button>
-                            <button className="p-1 rounded-md text-gray-800 hover:bg-teal-500 hover:text-white transition ml-1">
+                            <button type="button" onClick={handleLogout} aria-label="Log out" className="p-1 rounded-md text-gray-800 hover:bg-teal-500 hover:text-white transition ml-1">
                                 <LogOut className="w-5 h-6" />
                             </button>     
                         </div>
@@ -96,7 +104,7 @@ export const EmployerDashboardNav: React.FC= () => {
                                 <div className="text-base font-medium text-gray-800">{userName}</div>
                                 <div className="text-sm font-medium text-gray-500">{userEmail}</div>
                             </div>
-                            <button className="ml-auto flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500">
+                            <button type="button" onClick={handleLogout} aria-label="Log out" className="ml-auto flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500">
                                 <LogOut className="h-6 w-6" />
                             </button>
                         </div>

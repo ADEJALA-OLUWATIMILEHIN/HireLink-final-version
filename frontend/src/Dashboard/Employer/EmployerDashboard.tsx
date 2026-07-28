@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
-import { type EmployerDashboardStats, type StatusBreakdown } from "../types"
+import { type EmployerDashboardStats } from "../types"
 import { StatCard } from "../JobSeeker/components/StatCard"
 import { Briefcase, FileSliders, TrendingUp, Users } from "lucide-react"
-import { ApplicationStatusBreakdown } from "../JobSeeker/components/ApplicationStatusBreakdown"
 import ActionButton from "./component/ActionButton"
 import RecentlyPostedJobs from "./component/RecentlyPostedJobs"
 import { Link } from "react-router-dom";
@@ -20,13 +19,6 @@ const EmployerDashboard = () => {
         totalJobPosted: 0,
         shortlisted: 0
     })
-
-    const [statusData] = useState<StatusBreakdown>({
-        applied: 2,
-        shortlisted: 1,
-        rejected: 0,
-        hired: 0,
-    });
 
     const {data} = useEmployerProfile();
 

@@ -19,7 +19,7 @@ export const PostJobs = async (data :PostNewJobFormSchemaType) => {
       if (!res.ok)
         return { message: "Something went wrong. Try again later", role: "null" };
   
-      const msg = await res.json();
+      await res.json();
       // console.log(token)
   
       return { message: "job posted successfully",  };

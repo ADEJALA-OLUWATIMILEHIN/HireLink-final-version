@@ -1,11 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
-import { postNewJobFormSchema, type postNewJobFormSchemaType } from "../../schemas/postNewJobFormSchema"
+import { postNewJobFormSchema, type PostNewJobFormSchemaType } from "../../schemas/postNewJobFormSchema"
 import ActionButton from "./component/ActionButton";
 import { PostJobs } from "../../api/EmployerApi/PostJobs";
 import { useState } from "react";
  
-type FieldName = keyof postNewJobFormSchemaType;
+type FieldName =
+    | "title"
+    | "company"
+    | "location"
+    | "location_type"
+    | "salary_min"
+    | "salary_max"
+    | "job_type"
+    | "description"
+    | "requirements";
  
 type SelectOption = {
     label: string;
@@ -117,11 +126,11 @@ const PostNewJob = () => {
 
     const [message,setMessage] = useState("")
  
-    const { handleSubmit, control, formState: { errors } } = useForm<postNewJobFormSchemaType>({
+    const { handleSubmit, control, formState: { errors } } = useForm<PostNewJobFormSchemaType>({
         resolver: zodResolver(postNewJobFormSchema),
     });
  
-    const handleSubmitForm = async (data: postNewJobFormSchemaType) => {
+    const handleSubmitForm = async (data: PostNewJobFormSchemaType) => {
         try {
             const res = await PostJobs(data);
             setMessage(res.message)

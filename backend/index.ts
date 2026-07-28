@@ -13,13 +13,11 @@ import dashboardRouter from "./route/dashboard";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
-import path from "path";
 
 
 const app = express();
 
 app.use(express.json());
-app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 app.use(cors({
   origin: "http://localhost:5173", // or your deployed frontend

@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
 import Application from "../models/application";
-import { uploadSingleFile } from "../middleware/upload";
+import { uploadFileToCloudinary, uploadSingleFile } from "../middleware/upload";
 import Job from "../models/job";
 import User from "../models/user";
 import multer from "multer";
@@ -55,8 +55,6 @@ import multer from "multer";
         if (!req.file) {
             return res.status(400).json({ message: "Please upload a resume" });
         }
-        const resume_url = `/uploads/${req.file.filename}`;
-
         // 5. Prevent Duplicate Applications
         // IMPORTANT: Check if your model uses jobseeker_Id or job_seeker_Id
         const existingApplication = await Application.findOne({
@@ -69,6 +67,8 @@ import multer from "multer";
         if (existingApplication) {
             return res.status(409).json({ message: "You have already applied for this job" });
         }
+
+        const resume_url = await uploadFileToCloudinary(req.file);
 
         // 6. Create Application
         const application = await Application.create({

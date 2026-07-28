@@ -19,6 +19,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
@@ -40,8 +41,6 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^24.9.2",
     "@types/swagger-jsdoc": "^6.0.4",
-    "@types/swagger-ui-express": "^4.1.8",
-    "sequelize-cli": "^6.6.3",
-    "tsx": "^4.21.0"
+    "@types/swagger-ui-express": "^4.1.8"
   }
 }

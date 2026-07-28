@@ -1,30 +1,25 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
-const uploadDir = path.resolve(process.cwd(), "uploads");
+const allowedExtensions = /\.(jpeg|jpg|png|pdf|doc|docx)$/i;
+const allowedMimeTypes = /^(image\/(jpeg|png)|application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document)$/;
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const configureCloudinary = () => {
+  const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
 
-// 1. Define where and how to store the file
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Give the file a unique name to avoid overwriting
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
-  },
-});
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+    throw new Error("Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.");
+  }
 
-// 2. Define the filter (PDF, JPG, PNG only)
+  cloudinary.config({
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+  });
+};
+
 const fileFilter = (req: any, file: any, cb: any) => {
-  const allowedExtensions = /jpeg|jpg|png|pdf|doc|docx/;
-  const allowedMimeTypes = /jpeg|jpg|png|pdf|msword|officedocument/;
-  const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+  const extname = allowedExtensions.test(file.originalname);
   const mimetype = allowedMimeTypes.test(file.mimetype);
 
   if (extname && mimetype) {
@@ -34,11 +29,38 @@ const fileFilter = (req: any, file: any, cb: any) => {
   }
 };
 
-// 3. Export the middleware
 export const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: fileFilter,
 });
 
 export const uploadSingleFile = upload.single("resume");
+
+export const uploadFileToCloudinary = (file: Express.Multer.File) =>
+  new Promise<string>((resolve, reject) => {
+    try {
+      configureCloudinary();
+
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "hirelink/resumes",
+          resource_type: "raw",
+          public_id: `resume-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+          overwrite: false,
+        },
+        (error, result) => {
+          if (error || !result?.secure_url) {
+            reject(error ?? new Error("Cloudinary did not return a file URL."));
+            return;
+          }
+
+          resolve(result.secure_url);
+        }
+      );
+
+      uploadStream.end(file.buffer);
+    } catch (error) {
+      reject(error);
+    }
+  });

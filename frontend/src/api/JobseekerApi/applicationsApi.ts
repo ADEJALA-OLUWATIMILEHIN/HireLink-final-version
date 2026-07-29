@@ -1,6 +1,5 @@
 import type { Application } from "../../Dashboard/types";
-
-const baseUrl = "http://localhost:3005/api/v1";
+import { API_BASE_URL as baseUrl } from "../config";
 
 const authHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("jwt")}`,

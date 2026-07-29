@@ -1,5 +1,7 @@
+import { API_BASE_URL } from "../config";
+
 export const SignUpApi = async (data: any) => {
-  const baseUrl = "http://localhost:3005/api/v1";
+  const baseUrl = API_BASE_URL;
 
   try {
     const res = await fetch(`${baseUrl}/register`, {

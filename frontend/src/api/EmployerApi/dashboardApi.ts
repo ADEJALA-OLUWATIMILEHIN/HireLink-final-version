@@ -1,6 +1,5 @@
 import type { EmployerDashboardStats } from "../../Dashboard/types";
-
-const baseUrl = "http://localhost:3005/api/v1";
+import { API_BASE_URL as baseUrl } from "../config";
 
 export const getEmployerDashboardStats = async (): Promise<{
   ok: boolean;

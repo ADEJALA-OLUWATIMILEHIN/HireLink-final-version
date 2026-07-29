@@ -6,8 +6,7 @@ import { RecentApplications } from "./components/RecentApplications";
 import type { DashboardStats, StatusBreakdown, Application } from "../types";
 import { useJobseekerProfile } from "../../api/JobseekerApi/profileApi";
 import { getRecentApplications } from "../../api/JobseekerApi/recentApplicationsApi";
-
-const baseUrl = "http://localhost:3005/api/v1";
+import { API_BASE_URL as baseUrl } from "../../api/config";
 
 const initialStats: DashboardStats = {
   totalApplications: 0,

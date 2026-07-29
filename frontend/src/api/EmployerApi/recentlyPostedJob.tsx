@@ -1,4 +1,5 @@
 import { useState,useEffect } from "react"
+import { API_BASE_URL } from "../config"
 
 
 interface EmployerProfile {
@@ -8,7 +9,6 @@ interface EmployerProfile {
 }
 
 export const getRecentlyPostedJobs = (_id: number) => {
-    const baseUrl = "http://localhost:3005"
     const token = localStorage.getItem("jwt")
 
     const [data, setData] = useState<EmployerProfile | null>(null)
@@ -18,7 +18,7 @@ export const getRecentlyPostedJobs = (_id: number) => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`${baseUrl}/api/v1/dashboard/employerinfo`, {
+                const res = await fetch(`${API_BASE_URL}/dashboard/employerinfo`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

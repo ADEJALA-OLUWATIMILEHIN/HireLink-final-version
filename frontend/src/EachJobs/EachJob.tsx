@@ -13,6 +13,7 @@ import {
 
 import { Header } from "../Components/Header.tsx";
 import { Footer } from "../Components/Footer.tsx";
+import { API_BASE_URL } from "../api/config";
 
 interface ApiJob {
   id: number;
@@ -83,7 +84,7 @@ const EachJob = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(`http://localhost:3005/api/v1/jobs/${id}`);
+        const res = await fetch(`${API_BASE_URL}/jobs/${id}`);
         const data = await res.json();
 
         setJob(res.ok && data.job ? mapJob(data.job) : null);

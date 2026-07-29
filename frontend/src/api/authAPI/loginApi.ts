@@ -1,5 +1,7 @@
+import { API_BASE_URL } from "../config";
+
 export const loginApi = async (data: { email: string; password: string;role :string }) => {
-  const baseUrl = "http://localhost:3005/api/v1";
+  const baseUrl = API_BASE_URL;
   console.log(baseUrl);
   console.log(data);
   console.log("Login API called");

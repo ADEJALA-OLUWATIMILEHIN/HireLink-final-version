@@ -2,7 +2,7 @@
 
 
 // export const useEmployerProfile = () => {
-//     const baseUrl = "http://localhost:3005"
+//     const baseUrl = BACKEND_URL
 //     const token = localStorage.getItem("jwt")
 
 //     const [data, setData] = useState()
@@ -40,6 +40,7 @@
 
 
 import { useEffect, useState } from "react"
+import { API_BASE_URL } from "../config"
 
 interface JobseekerProfile {
     name: string
@@ -47,7 +48,6 @@ interface JobseekerProfile {
 }
 
 export const useJobseekerProfile = () => {
-    const baseUrl = "http://localhost:3005"
     const token = localStorage.getItem("jwt")
 
     const [data, setData] = useState<JobseekerProfile | null>(null)
@@ -57,7 +57,7 @@ export const useJobseekerProfile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`${baseUrl}/api/v1/dashboard/jobseekerinfo`, {
+                const res = await fetch(`${API_BASE_URL}/dashboard/jobseekerinfo`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

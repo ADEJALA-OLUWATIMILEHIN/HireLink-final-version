@@ -2,7 +2,7 @@
 
 
 // export const useEmployerProfile = () => {
-//     const baseUrl = "http://localhost:3005"
+//     const baseUrl = BACKEND_URL
 //     const token = localStorage.getItem("jwt")
 
 //     const [data, setData] = useState()
@@ -40,6 +40,7 @@
 
 
 import { useEffect, useState } from "react"
+import { API_BASE_URL } from "../config"
 
 interface EmployerProfile {
     name: string
@@ -48,7 +49,6 @@ interface EmployerProfile {
 }
 
 export const useEmployerProfile = () => {
-    const baseUrl = "http://localhost:3005"
     const token = localStorage.getItem("jwt")
 
     const [data, setData] = useState<EmployerProfile | null>(null)
@@ -58,7 +58,7 @@ export const useEmployerProfile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`${baseUrl}/api/v1/dashboard/employerinfo`, {
+                const res = await fetch(`${API_BASE_URL}/dashboard/employerinfo`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

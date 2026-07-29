@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:3005/api/v1";
+import { API_BASE_URL as baseUrl } from "../config";
 
 export const resetPasswordApi = async (userId: string | number, password: string) => {
   try {

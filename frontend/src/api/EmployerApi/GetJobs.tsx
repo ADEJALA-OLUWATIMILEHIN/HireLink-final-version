@@ -1,3 +1,5 @@
+import { API_BASE_URL as baseUrl } from "../config";
+
 export interface ApiJob {
   id: number;
   title: string;
@@ -58,8 +60,6 @@ export const mapJob = (job: ApiJob): Job => ({
 });
 
 export const GetJobs = async () => {
-  const baseUrl = "http://localhost:3005/api/v1";
-
   try {
     const res = await fetch(`${baseUrl}/jobs`, {
       method: "GET",

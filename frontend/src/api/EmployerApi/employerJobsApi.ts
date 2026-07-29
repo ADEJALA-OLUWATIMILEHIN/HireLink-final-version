@@ -1,8 +1,7 @@
 import { mapJob, type ApiJob, type Job } from "./GetJobs";
+import { API_BASE_URL as baseUrl } from "../config";
 
 export type { Job };
-
-const baseUrl = "http://localhost:3005/api/v1";
 
 const authHeaders = () => ({
   "Content-Type": "application/json",

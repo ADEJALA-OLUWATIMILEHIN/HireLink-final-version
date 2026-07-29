@@ -1,7 +1,8 @@
 import type { PostNewJobFormSchemaType } from "../../schemas/postNewJobFormSchema";
+import { API_BASE_URL } from "../config";
 
 export const PostJobs = async (data :PostNewJobFormSchemaType) => {
-    const baseUrl = "http://localhost:3005/api/v1";
+    const baseUrl = API_BASE_URL;
     console.log(baseUrl);
     console.log(data);
     console.log("post Jobs API called");

@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: "http://localhost:5173", // or your deployed frontend
+  origin: "https://hire-link-final-version.vercel.app/", // or your deployed frontend
   credentials: true
 }));
 

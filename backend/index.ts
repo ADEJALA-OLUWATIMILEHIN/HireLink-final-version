@@ -19,10 +19,13 @@ const app = express();
 
 app.use(express.json());
 
+
 app.use(cors({
-  origin: "https://hire-link-final-version.vercel.app/", // or your deployed frontend
+  origin:   process.env.FRONTEND_URL, // or your deployed frontend
   credentials: true
 }));
+
+
 
 const options = {
   definition: {
